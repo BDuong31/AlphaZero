@@ -1,5 +1,4 @@
-Triển khai [Kiến trúc AlphaZero](https://deepmind.com/blog/article/alphazero-shedding-new-light-grand-games-chess-shogi-and-go) cho trò chơi Connect4 với hướng dẫn từ cuốn sách [Deep Reinforcement Learning Hands-on](https://www.amazon.com/Deep-Reinforcement-Learning-Hands-optimization-ebook-dp-B07ZKDLZCR/dp/B07ZKDLZCR/ref=mt_other?_encoding=UTF8&me=&qid=).
-Đã cấu trúc lại cơ sở mã để có thể dễ dàng mở rộng với các trò chơi mới. Đã thêm lớp [m,n,k-game](https://en.wikipedia.org/wiki/M,n,k-game) và mô hình được đào tạo để chơi Tic-Tac-Toe.
+Triển khai [Kiến trúc AlphaZero](https://deepmind.com/blog/article/alphazero-shedding-new-light-grand-games-chess-shogi-and-go) có cấu trúc lại cơ sở mã để có thể dễ dàng mở rộng với các trò chơi mới.Thiết kế sẵn lớp [m,n,k-game](https://en.wikipedia.org/wiki/M,n,k-game) và cấu trúc sẵn 2 trò chơi caro (19x19) và Tic Tac Toe (3x3).
 # Nội dung thực tế
 ## Cài đặt
 Môi trường được quản lý bằng [Pipenv](https://pipenv.pypa.io/en/latest/install/). Từ thư mục dự án của bạn, hãy chạy `pipenv install` để cài đặt tất cả các phụ thuộc từ Pipfile.
@@ -14,9 +13,7 @@ Có thể quan sát số liệu thống kê huấn luyện bằng TensorBoard. B
 [http://localhost:6006/](http://localhost:6006/)). Từ TensorBoard, bạn có thể quan sát được giá trị mất mát ở mỗi bước đào tạo và tỷ lệ chiến thắng của đối thủ so với mô hình tốt nhất hiện tại. Biểu đồ sau có thể sẽ tăng lên đến một điểm trước khi giảm mạnh khi mô hình tốt nhất được thay thế bằng một đối thủ đủ thành công, trước khi tăng trở lại khi một đối thủ mới trở nên tốt hơn. 
 ## Cho các mô hình chơi với nhau
 Các mô hình cũng có thể chơi với nhau bằng cách sử dụng
-`python play.py -g [game] model1_filename model2_filename ...` e.g.:
-`python play.py -g 0 saves/trained_connect4/best_025_10600.dat saves/trained_connect4/best_026_12000.dat`
-`python play.py -g 1 saves/trained_tictactoe/best_005_00900.dat saves/trained_tictactoe/best_004_00800.dat`
+`python play.py -g [game] model1_filename model2_filename ...` 
 Bạn cũng có thể chỉ định số vòng mà các mô hình sẽ chơi bằng đối số `-r`
 Tập lệnh sẽ in bảng xếp hạng các mô hình với chiến thắng, thua và hòa
 # Thêm chi tiết
@@ -33,7 +30,7 @@ Sẽ có thêm thông tin chi tiết trong từng thành phần.
 `lib/mcts.py`
 Có thể nói đây là cốt lõi của AlphaZero. Bạn có thể nghĩ về MCTS như AlphaZero "suy nghĩ trước" từ một trạng thái trò chơi nhất định. MCTS về cơ bản là tiến hành một cây trò chơi, tức là một biểu đồ các trạng thái trò chơi với các cạnh là các hành động dẫn từ trạng thái này sang trạng thái khác. Đối với mọi trạng thái trò chơi `s` đã được khám phá và đối với mỗi hành động `a` tại mỗi trạng thái trò chơi `s`, dữ liệu sau đây được theo dõi:
 1. Số lần hành động `a` đã được thực hiện tại trạng thái trò chơi `s`: `N(s,a)`
-2. [Phần thưởng dự kiến](https://en.wikipedia.org/wiki/Q-learning) của hành động `a`: `Q(s,a)`
+2. [Kết quả kỳ vọng](https://en.wikipedia.org/wiki/Q-learning) của hành động `a`: `Q(s,a)`
 3. Xác suất trước đó để thực hiện hành động `a`, được dự đoán bởi mạng nơ-ron (tốt nhất hiện tại), cho trạng thái trò chơi `s`: `p(s,a)`
 Từ những điều trên (và siêu tham số `c_puct`), chúng ta có thể tính toán giới hạn độ tin cậy trên đã điều chỉnh cho các giá trị Q của mỗi hành động tại mỗi trạng thái trò chơi `U(s,a)`.
 Đối với hầu hết các trò chơi, rõ ràng là có nhiều trạng thái trò chơi hơn mức có thể khám phá, nhưng giá trị trên có thể đóng vai trò là phương pháp tìm kiếm để chọn trạng thái trò chơi nào cần kiểm tra.
@@ -60,4 +57,4 @@ Trò chơi cũng cần cập nhật trạng thái trò chơi sau mỗi lần di 
 Cuối cùng, trò chơi có trách nhiệm chuyển đổi trạng thái trò chơi của mình thành danh sách các đầu vào để đào tạo mạng nơ-ron. Theo bài báo AlphaZero, đầu vào là một mảng 2 chiều 2 kênh, với mỗi kênh là vị trí của các quân cờ của một người chơi trên bảng trò chơi. MCTS sẽ nhóm các trạng thái trò chơi lại với nhau trong một danh sách để đào tạo mạng theo từng đợt, do đó trò chơi sẽ có thể chuyển đổi danh sách các trạng thái trò chơi thành danh sách các mảng có thể nhập vào mạng.
 Để thêm trò chơi mới, chỉ cần thêm một mô-đun khác vào thư mục `lib/game` và triển khai giao diện `BaseGame` được định nghĩa trong `lib/game/game.py`. Danh mục các trò chơi khả dụng được lưu trong `lib/game/game_provider.py`. Sửa đổi mục này để cung cấp trò chơi của bạn cho các tập lệnh train, play.
 ## tham số
-Tất cả các siêu tham số có thể được tìm thấy trong `config.py`. Các giá trị được lấy từ bài báo AlphaZero cho Go, trừ khi có ghi chú khác, ngoại trừ MCTS_SEARCHES và MCTS_BATCH_SIZE, là những điểm kỳ quặc trong triển khai cho PyTorch từ cuốn sách Deep Reinforcement Learning Hands-on. Tôi chưa thử nghiệm điều chỉnh các siêu tham số này, nhưng sẽ thực hiện trong tương lai gần.
+Tất cả các siêu tham số có thể được tìm thấy trong `config.py`. Các giá trị được lấy từ bài báo AlphaZero cho Go, trừ khi có ghi chú khác.
