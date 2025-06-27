@@ -1,5 +1,7 @@
 from lib.game.tictactoe.tictactoe import TicTacToe
 from lib.game.caro.caro_19x19 import Caro19x19
+from lib.game.n_puzzle.n_puzzle import NPuzzle
+from lib.game.caro_5x5.caro_5x5 import Caro5x5
 
 def add_game_argument(parser):
     """
@@ -8,8 +10,8 @@ def add_game_argument(parser):
     Đối số:
         parser (argparse.ArgumentParser): Trình phân tích đối số để thêm đối số trò chơi
     """
-    parser.add_argument("-g", "--game", required=True, choices=['0', '1'],
-                        help="Loại trò chơi: 0 - Caro 19x19, 1 - Tic Tac Toe")
+    parser.add_argument("-g", "--game", required=True, choices=['0', '1', '2', '3'],
+                        help="Loại trò chơi: 0 - Caro 19x19, 1 - Tic Tac Toe, 2 - N-Puzzle, 3 - Caro 5x5")
 def get_game(args):
     """
     Trả về trò chơi dựa trên đối số đã phân tích
@@ -25,5 +27,9 @@ def get_game(args):
         return Caro19x19()
     elif game_type == '1':
         return TicTacToe()
+    elif game_type == '2':
+        return NPuzzle()
+    elif game_type == '3':
+        return Caro5x5()
     else:
         raise ValueError("Trò chơi không hợp lệ")

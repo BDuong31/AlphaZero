@@ -22,6 +22,7 @@ class Session:
 
     def move_player(self, move: int) -> bool:
         self.moves.append(move)
+        print("Người chơi chọn nước đi:", move)
         self.state, won = self.game.move(self.state, move, self.USER_PLAYER)
         return won
 
@@ -32,6 +33,7 @@ class Session:
         action = np.random.choice(self.game.action_space, p=probs)
         self.value = values[action]
         self.moves.append(action)
+        print("Bot chọn nước đi:", action, "với xác suất:", probs[action])
         self.state, won = self.game.move(self.state, action, self.BOT_PLAYER)
         return won
 

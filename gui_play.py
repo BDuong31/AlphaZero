@@ -19,6 +19,7 @@ from lib.play_session import Session
 from lib.game import game_provider
 from lib.game.tictactoe.tictactoe import TicTacToe
 from lib.game.caro.caro_19x19 import Caro19x19
+from lib.game.caro_5x5.caro_5x5 import Caro5x5
 
 # --- Cấu hình Pygame và Giao diện ---
 SCREEN_WIDTH = 400
@@ -80,7 +81,7 @@ def convert_coords_to_move(pos, rows, cols):
     return r * cols + c
 
 def get_list_state(game, state):
-    if isinstance(game, (TicTacToe, Caro19x19)):
+    if isinstance(game, (TicTacToe, Caro5x5)):
         return game.convert_mcts_state_to_list_state(state)
     raise TypeError(f"Loại game không xác định: {type(game).__name__}")
 
@@ -115,7 +116,7 @@ def main():
 
     rows, cols = get_board_dimensions(game)
     
-    if isinstance(game, Caro19x19):
+    if isinstance(game, TicTacToe):
         BOARD_SIZE = 760
         SCREEN_WIDTH = 760
         SCREEN_HEIGHT = 820

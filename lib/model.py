@@ -3,7 +3,7 @@ import numpy as np
 import torch
 import torch.nn as nn
 
-NUM_FILTERS = 64
+NUM_FILTERS = 128
 
 # Mạng nơ-ron để dự đoán giá trị và chính sách
 class Net(nn.Module):
