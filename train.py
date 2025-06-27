@@ -51,11 +51,11 @@ def self_play(game: BaseGame, mcts_store: MCTS, replay_buffer: Union[collections
     dt = time.time() - t
     speed_steps = game_steps / dt
     speed_nodes = game_nodes / dt
-    tb_tracker.track("tốc độ bước", speed_steps, step_idx)
-    tb_tracker.track("tốc độ nút lá", speed_nodes, step_idx)
+    tb_tracker.track("speed step", speed_steps, step_idx)
+    tb_tracker.track("speed node", speed_nodes, step_idx)
     sys.stdout.flush()
     buffer_len = len(replay_buffer) if replay_buffer else 0
-    print("Bước %d, bước trò chơi %3d, nút lá %4d, bước/s %5.2f, nút lá/s %6.2f, chỉ số tốt nhất %d, replay %d" % (
+    print("Step %d, game steps %3d, node %4d, step/s %5.2f, node/s %6.2f, best idx %d, replay %d" % (
         step_idx, game_steps, game_nodes, speed_steps, speed_nodes, best_idx, buffer_len),
         end='\r')
 
@@ -112,10 +112,10 @@ def train_neural_net(game: BaseGame, replay_buffer: collections.deque, optimizer
         sum_value_loss += loss_value_v.item()
         sum_policy_loss += loss_policy_v.item()
 
-    tb_tracker.track("tổng mất mát", sum_loss / TRAIN_ROUNDS, step_idx)
-    tb_tracker.track("giá trị mất mát", sum_value_loss /
+    tb_tracker.track("total loss", sum_loss / TRAIN_ROUNDS, step_idx)
+    tb_tracker.track("value loss", sum_value_loss /
                      TRAIN_ROUNDS, step_idx)
-    tb_tracker.track("chính sách mất mát", sum_policy_loss /
+    tb_tracker.track("policy loss", sum_policy_loss /
                      TRAIN_ROUNDS, step_idx)
 
 
@@ -210,7 +210,7 @@ if __name__ == "__main__":
                 win_ratio = evaluate(game,
                                      net, best_net.target_model, rounds=cfg.EVALUATION_ROUNDS, device=device)
                 print("Mạng đã được đánh giá, tỷ lệ thắng = %.2f" % win_ratio)
-                writer.add_scalar("tỷ lệ thắng trong đánh giá", win_ratio, step_idx)
+                writer.add_scalar("Win ratio", win_ratio, step_idx)
                 if win_ratio > cfg.BEST_NET_WIN_RATIO:
                     print("Mạng tốt hơn cur best, đồng bộ")
                     best_net.sync()
